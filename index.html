@@ -34,15 +34,22 @@
         .button.countable {
             border-color: #ccc;
         }
+        .button.wide {
+            width: 120px;
+        }
         .button.active {
             border-color: red;
+        }
+        .button.transparent-green {
+            background-color: rgba(0, 255, 0, 0.3);
+            border: 2px solid rgba(0, 255, 0, 0.3);
         }
         .button-group .count {
             color: red;
             font-weight: bold;
         }
         #summary {
-            margin: 20px 0;
+            margin: 50px 0;
             font-size: 16px;
         }
         #reset {
@@ -61,19 +68,20 @@
     <h1>마감 자재 파악</h1>
     
     <div class="section">
-        <h2>식자재 (빙고 그룹 1)</h2>
+        <h2>[메인 식자재]</h2>
         <div class="button-group">
             <button class="button countable" id="원두" onclick="incrementCount('원두')">원두 <span class="count" id="count-원두">0</span></button>
             <button class="button countable" id="우유" onclick="incrementCount('우유')">우유 <span class="count" id="count-우유">0</span></button>
             <button class="button countable" id="연유" onclick="incrementCount('연유')">연유 <span class="count" id="count-연유">0</span></button>
             <button class="button countable" id="생크림" onclick="incrementCount('생크림')">생크림 <span class="count" id="count-생크림">0</span></button>
-            <button class="button countable" id="티라미수" onclick="incrementCount('티라미수')">티라미수 <span class="count" id="count-티라미수">0</span></button>
-            <button class="button countable" id="치즈케이크" onclick="incrementCount('치즈케이크')">치즈케이크 <span class="count" id="count-치즈케이크">0</span></button>
+            <button class="button countable wide" id="티라미수" onclick="incrementCount('티라미수')">티라미수 <span class="count" id="count-티라미수">0</span></button>
+            <button class="button countable wide" id="치즈케이크" onclick="incrementCount('치즈케이크')">치즈케이크 <span class="count" id="count-치즈케이크">0</span></button>
+            <button class="button transparent-green" id="많이" onclick="markAsMany()">많이</button>
         </div>
     </div>
 
     <div class="section">
-        <h2>식자재 (빙고 그룹 2)</h2>
+        <h2>[구매 필요한 식자재만 체크]</h2>
         <div class="button-group">
             <button class="button" id="녹차분말" onclick="toggleActive('녹차분말')">녹차분말</button>
             <button class="button" id="얼그레이분말" onclick="toggleActive('얼그레이분말')">얼그레이 분말</button>
@@ -86,11 +94,13 @@
             <button class="button" id="코코아파우더" onclick="toggleActive('코코아파우더')">코코아 파우더</button>
             <button class="button" id="사이다" onclick="toggleActive('사이다')">사이다</button>
             <button class="button" id="탄산수" onclick="toggleActive('탄산수')">탄산수</button>
+            <button class="button" id="레몬" onclick="toggleActive('레몬')">레몬</button>
+            <button class="button" id="애플시나몬청" onclick="toggleActive('애플시나몬청')">애플 시나몬청</button>
         </div>
     </div>
 
     <div class="section">
-        <h2>일회용품</h2>
+        <h2>[구매 필요한 일회용품만 체크]</h2>
         <div class="button-group">
             <button class="button" id="테이크아웃컵" onclick="toggleActive('테이크아웃컵')">테이크아웃 컵</button>
             <button class="button" id="테이크아웃뚜껑" onclick="toggleActive('테이크아웃뚜껑')">테이크아웃 뚜껑</button>
@@ -106,12 +116,15 @@
         </div>
     </div>
 
-    <div id="summary"></div>
+    <div id="summary">
+        <br><br><br><br><br>--------
+    </div>
     <button id="reset" onclick="resetPage()">다시 재고 파악하기</button>
 
     <script>
         const counts = {};
         const activeItems = new Set();
+        let markedAsMany = false;
 
         function incrementCount(item) {
             counts[item] = (counts[item] || 0) + 1;
@@ -131,20 +144,29 @@
             updateSummary();
         }
 
+        function markAsMany() {
+            markedAsMany = true;
+            const button = document.getElementById('많이');
+            button.textContent = "많이";
+            updateSummary();
+        }
+
         function updateSummary() {
             const summaryDiv = document.getElementById('summary');
-            let summaryText = '<h2>현재 자재 상태</h2>';
-            summaryText += '<p>식자재(빙고 그룹 1):</p><ul>';
+            let summaryText = '';
             for (const item in counts) {
-                summaryText += `<li>${item}: ${counts[item]}</li>`;
+                summaryText += `${item} ${counts[item]}<br>`;
             }
-            summaryText += '</ul>';
+            if (markedAsMany) {
+                summaryText += '티라미수 많이<br>';
+            }
+            summaryText += '<br><br><br>--------<br><br><br>';
             if (activeItems.size > 0) {
-                summaryText += '<p>[구매 필요]</p><ul>';
+                summaryText += '[구매 필요]<br>';
                 for (const item of activeItems) {
-                    summaryText += `<li>${item}</li>`;
+                    summaryText += `- ${item}<br>`;
                 }
-                summaryText += '</ul>';
+                summaryText += '<br>--------<br>';
             }
             summaryDiv.innerHTML = summaryText;
         }
