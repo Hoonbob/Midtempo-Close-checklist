@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마감 자재 파악</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .section {
+            margin: 20px 0;
+        }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        .button {
+            padding: 10px 20px;
+            border: 2px solid green;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: white;
+            font-size: 14px;
+        }
+        .button.countable {
+            border-color: #ccc;
+        }
+        .button.active {
+            border-color: red;
+        }
+        .button-group .count {
+            color: red;
+            font-weight: bold;
+        }
+        #summary {
+            margin: 20px 0;
+            font-size: 16px;
+        }
+        #reset {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>마감 자재 파악</h1>
+    
+    <div class="section">
+        <h2>식자재 (빙고 그룹 1)</h2>
+        <div class="button-group">
+            <button class="button countable" id="원두" onclick="incrementCount('원두')">원두 <span class="count" id="count-원두">0</span></button>
+            <button class="button countable" id="우유" onclick="incrementCount('우유')">우유 <span class="count" id="count-우유">0</span></button>
+            <button class="button countable" id="연유" onclick="incrementCount('연유')">연유 <span class="count" id="count-연유">0</span></button>
+            <button class="button countable" id="생크림" onclick="incrementCount('생크림')">생크림 <span class="count" id="count-생크림">0</span></button>
+            <button class="button countable" id="티라미수" onclick="incrementCount('티라미수')">티라미수 <span class="count" id="count-티라미수">0</span></button>
+            <button class="button countable" id="치즈케이크" onclick="incrementCount('치즈케이크')">치즈케이크 <span class="count" id="count-치즈케이크">0</span></button>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>식자재 (빙고 그룹 2)</h2>
+        <div class="button-group">
+            <button class="button" id="녹차분말" onclick="toggleActive('녹차분말')">녹차분말</button>
+            <button class="button" id="얼그레이분말" onclick="toggleActive('얼그레이분말')">얼그레이 분말</button>
+            <button class="button" id="초코분말" onclick="toggleActive('초코분말')">초코 분말</button>
+            <button class="button" id="위스키" onclick="toggleActive('위스키')">위스키</button>
+            <button class="button" id="바닐라시럽" onclick="toggleActive('바닐라시럽')">바닐라 시럽</button>
+            <button class="button" id="얼그레이시럽" onclick="toggleActive('얼그레이시럽')">얼그레이 시럽</button>
+            <button class="button" id="초콜렛" onclick="toggleActive('초콜렛')">초콜렛</button>
+            <button class="button" id="설탕" onclick="toggleActive('설탕')">설탕</button>
+            <button class="button" id="코코아파우더" onclick="toggleActive('코코아파우더')">코코아 파우더</button>
+            <button class="button" id="사이다" onclick="toggleActive('사이다')">사이다</button>
+            <button class="button" id="탄산수" onclick="toggleActive('탄산수')">탄산수</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>일회용품</h2>
+        <div class="button-group">
+            <button class="button" id="테이크아웃컵" onclick="toggleActive('테이크아웃컵')">테이크아웃 컵</button>
+            <button class="button" id="테이크아웃뚜껑" onclick="toggleActive('테이크아웃뚜껑')">테이크아웃 뚜껑</button>
+            <button class="button" id="빨대" onclick="toggleActive('빨대')">빨대</button>
+            <button class="button" id="디저트용기" onclick="toggleActive('디저트용기')">디저트 용기</button>
+            <button class="button" id="냅킨" onclick="toggleActive('냅킨')">냅킨</button>
+            <button class="button" id="화장실티슈" onclick="toggleActive('화장실티슈')">화장실 티슈</button>
+            <button class="button" id="두루마리휴지" onclick="toggleActive('두루마리휴지')">두루마리 휴지</button>
+            <button class="button" id="유산지" onclick="toggleActive('유산지')">유산지</button>
+            <button class="button" id="주방세제" onclick="toggleActive('주방세제')">주방 세제</button>
+            <button class="button" id="세탁세제" onclick="toggleActive('세탁세제')">세탁 세제</button>
+            <button class="button" id="청소포" onclick="toggleActive('청소포')">청소포</button>
+        </div>
+    </div>
+
+    <div id="summary"></div>
+    <button id="reset" onclick="resetPage()">다시 재고 파악하기</button>
+
+    <script>
+        const counts = {};
+        const activeItems = new Set();
+
+        function incrementCount(item) {
+            counts[item] = (counts[item] || 0) + 1;
+            document.getElementById('count-' + item).textContent = counts[item];
+            updateSummary();
+        }
+
+        function toggleActive(item) {
+            const button = document.getElementById(item);
+            if (activeItems.has(item)) {
+                activeItems.delete(item);
+                button.classList.remove('active');
+            } else {
+                activeItems.add(item);
+                button.classList.add('active');
+            }
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const summaryDiv = document.getElementById('summary');
+            let summaryText = '<h2>현재 자재 상태</h2>';
+            summaryText += '<p>식자재(빙고 그룹 1):</p><ul>';
+            for (const item in counts) {
+                summaryText += `<li>${item}: ${counts[item]}</li>`;
+            }
+            summaryText += '</ul>';
+            if (activeItems.size > 0) {
+                summaryText += '<p>[구매 필요]</p><ul>';
+                for (const item of activeItems) {
+                    summaryText += `<li>${item}</li>`;
+                }
+                summaryText += '</ul>';
+            }
+            summaryDiv.innerHTML = summaryText;
+        }
+
+        function resetPage() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>
