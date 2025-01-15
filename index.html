@@ -151,7 +151,8 @@
     </div>
 
     <div id="summary">
-        <br><br><br><br><br>--------
+        <br><br>--------
+        <br>[구매 필요]<br>
     </div>
     <button id="reset" onclick="resetPage()">다시 재고 파악하기</button>
 
@@ -198,9 +199,8 @@
             manyItems.forEach(item => {
                 summaryText += `${item} 많이<br>`;
             });
-            summaryText += '<br><br><br>--------<br><br><br>';
+            summaryText += '<br>--------<br>[구매 필요]<br>';
             if (activeItems.size > 0) {
-                summaryText += '[구매 필요]<br>';
                 for (const item of activeItems) {
                     summaryText += `- ${item}<br>`;
                 }
