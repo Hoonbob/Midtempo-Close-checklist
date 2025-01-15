@@ -165,12 +165,18 @@
                        "레몬", "애플시나몬청", "테이크아웃컵", "테이크아웃뚜껑", "빨대", "디저트용기", "냅킨", "화장실티슈", "두루마리휴지", "유산지", "주방세제", "세탁세제", "청소포"];
 
         function incrementCount(item) {
+            if (item === "티라미수" || item === "치즈케이크") {
+                manyItems.delete(item); // Remove "많이" if count is updated
+            }
             counts[item] = (counts[item] || 0) + 1;
             document.getElementById('count-' + item).textContent = counts[item];
             updateSummary();
         }
 
         function decrementCount(item) {
+            if (item === "티라미수" || item === "치즈케이크") {
+                manyItems.delete(item); // Remove "많이" if count is updated
+            }
             counts[item] = Math.max((counts[item] || 0) - 1, 0);
             document.getElementById('count-' + item).textContent = counts[item];
             updateSummary();
@@ -189,6 +195,9 @@
         }
 
         function markAsMany(item) {
+            if (item === "티라미수" || item === "치즈케이크") {
+                counts[item] = 0; // Reset count if "많이" is marked
+            }
             manyItems.add(item);
             updateSummary();
         }
@@ -198,11 +207,10 @@
             let summaryText = '';
 
             order.forEach(item => {
-                if (counts[item] > 0) {
-                    summaryText += `${item} ${counts[item]}<br>`;
-                }
                 if (manyItems.has(item)) {
                     summaryText += `${item} 많이<br>`;
+                } else if (counts[item] > 0) {
+                    summaryText += `${item} ${counts[item]}<br>`;
                 }
             });
 
